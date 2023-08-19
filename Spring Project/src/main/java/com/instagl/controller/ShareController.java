@@ -1,14 +1,11 @@
 package com.instagl.controller;
 
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import org.json.simple.parser.ParseException;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +20,6 @@ import com.instagl.entity.Account;
 import com.instagl.entity.Content;
 import com.instagl.service.AccountService;
 import com.instagl.service.ContentServie;
-import com.instagl.service.ShareService;
-import com.microsoft.playwright.Response;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/")
 @RequiredArgsConstructor
 public class ShareController {
-	
-	private final ShareService shareService;
 	
 	private final AccountService accountService;
 	
@@ -43,16 +36,9 @@ public class ShareController {
 	@GetMapping("{username}")
 	public List<Content> getFeed(@PathVariable String username) throws InterruptedException, ParseException {
 		
-		List<Content> contents = new ArrayList<>();
+		Account account = accountService.getAccount(username).orElseThrow(() -> new NoSuchElementException("계정이 존재하지 않습니다."));
 		
-		Optional<Account> option = accountService.getAccount(username);
-		
-		if(option.isEmpty()) {
-			contents = shareService.getAccount(username);
-		} else {
-			contents = contentServie.findByAccountId(option.get());
-		}
-		
+		List<Content> contents = contentServie.findByAccountId(account);
 		return contents;
 	}
 	

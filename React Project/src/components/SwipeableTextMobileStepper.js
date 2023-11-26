@@ -25,7 +25,7 @@ function SwipeableTextMobileStepper({ info }) {
   const getImages = async (url) => {
     return await axios({
       method: "post",
-      url: `http://146.56.38.5:8080/image`,
+      url: `http://localhost:7060/image`,
       data: url,
       responseType: "blob",
     });

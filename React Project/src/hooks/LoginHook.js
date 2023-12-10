@@ -60,6 +60,7 @@ function MapHook() {
       .get(`https://localhost:7060/login/accessToken?code=${code}`)
       .then((response) => {
         console.log(response);
+        navigate(`/margatsni?code=${response.data.access_token}`);
       });
   }, [code]);
 

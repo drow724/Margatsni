@@ -1,7 +1,10 @@
 import { Face } from "@mui/icons-material";
 import React, { useRef, useState, useMemo } from "react";
 import { Map, Layer } from "react-map-gl";
-import { FacebookLoginButton } from "react-social-login-buttons";
+import {
+  FacebookLoginButton,
+  TwitterLoginButton,
+} from "react-social-login-buttons";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiZHJvdzcyNCIsImEiOiJjbGI3dGpiZ3AwZGRvM3NvMnU5a2w3ZHh4In0.Ei81FJmfrOdiB2Rn2rlKyA";
@@ -35,11 +38,28 @@ function MapHook() {
         }}
         ref={mapRef}
         mapboxAccessToken={MAPBOX_TOKEN}
-        style={{ width: "100%", height: "100vh", opacity: 0.8 }}
+        style={{ width: "100%", height: "100vh", position: "fixed" }}
         mapStyle="mapbox://styles/mapbox/dark-v11"
+      ></Map>
+      <div
+        style={{
+          position: "fixed",
+          width: "20%",
+          height: "100%",
+          margin: "0 auto",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          top: 0,
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <FacebookLoginButton />
-      </Map>
+        <TwitterLoginButton />
+      </div>
     </React.Fragment>
   );
 }

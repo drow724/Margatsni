@@ -23,8 +23,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@AllArgsConstructor
 public class Content {
 
 	@Id
@@ -41,4 +39,8 @@ public class Content {
 	@JoinColumn(name = "account_id")
 	private Account account;
 
+	public Content(String caption, Location location) {
+		this.caption = caption;
+		this.location = location;
+	}
 }

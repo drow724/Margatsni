@@ -24,6 +24,9 @@ const username = "username";
 function MapHook() {
   const url = new URL(window.location.href);
 
+  const searchParams = url.searchParams;
+  const code = searchParams.get("code");
+
   const [loading, setLoading] = useState(true);
 
   const [contents, setContents] = useState([]);
@@ -55,7 +58,7 @@ function MapHook() {
     const user = url.searchParams.get(username);
     await axios({
       method: "get",
-      url: `http://localhost:7060/${user}`,
+      url: `http://localhost:7060?accessToken=${code}`,
     }).then((response) => {
       setContents(response.data);
       setLng(() => {

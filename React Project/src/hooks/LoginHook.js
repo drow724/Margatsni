@@ -1,41 +1,71 @@
 import { Face } from "@mui/icons-material";
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState, useMemo, useEffect } from "react";
 import { Map, Layer } from "react-map-gl";
 import {
   FacebookLoginButton,
+  InstagramLoginButton,
   TwitterLoginButton,
 } from "react-social-login-buttons";
+
+import axios from "axios";
+
+import { Form, useNavigate } from "react-router-dom";
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiZHJvdzcyNCIsImEiOiJjbGI3dGpiZ3AwZGRvM3NvMnU5a2w3ZHh4In0.Ei81FJmfrOdiB2Rn2rlKyA";
 
 function MapHook() {
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(2);
+  const navigate = useNavigate();
 
   const mapRef = useRef();
 
-  const logins = (
-    <Layer
-      anchor="bottom"
-      onClick={(e) => {
-        // If we let the click event propagates to the map, it will immediately close the popup
-        // with `closeOnClick: true`
-        e.originalEvent.stopPropagation();
-      }}
-    >
-      <FacebookLoginButton />
-    </Layer>
-  );
+  const [popup, setPopup] = useState(null);
+  const [code, setCode] = useState(null);
+
+  useEffect(() => {
+    if (!popup) {
+      return;
+    }
+
+    const githubOAuthCodeListener = (e) => {
+      // 동일한 Origin 의 이벤트만 처리하도록 제한
+      if (e.origin !== window.location.origin) {
+        return;
+      }
+      const { code } = e.data;
+      console.log(e);
+      if (code) {
+        console.log(`The popup URL has URL code param = ${code}`);
+        setCode(code);
+      }
+      popup?.close();
+      setPopup(null);
+    };
+
+    window.addEventListener("message", githubOAuthCodeListener, false);
+
+    return () => {
+      window.removeEventListener("message", githubOAuthCodeListener);
+      popup?.close();
+      setPopup(null);
+    };
+  }, [popup]);
+
+  useEffect(() => {
+    if (!code) {
+      return;
+    }
+
+    axios
+      .get(`https://localhost:7060/login/accessToken?code=${code}`)
+      .then((response) => {
+        console.log(response);
+      });
+  }, [code]);
+
   return (
     <React.Fragment>
       <Map
-        initialViewState={{
-          longitude: lng,
-          latitude: lat,
-          zoom: zoom,
-        }}
         ref={mapRef}
         mapboxAccessToken={MAPBOX_TOKEN}
         style={{ width: "100%", height: "100vh", position: "fixed" }}
@@ -57,8 +87,16 @@ function MapHook() {
           alignItems: "center",
         }}
       >
-        <FacebookLoginButton />
-        <TwitterLoginButton />
+        <InstagramLoginButton
+          onClick={() => {
+            const popup = window.open(
+              "https://api.instagram.com/oauth/authorize?client_id=1202988193978178&redirect_uri=https://localhost:3000/margatsni/login&response_type=code&scope=user_profile,user_media",
+              "인스타그램 로그인",
+              "popup=yes"
+            );
+            setPopup(popup);
+          }}
+        />
       </div>
     </React.Fragment>
   );

@@ -36,9 +36,6 @@ public class Content {
 	@Embedded
 	private Location location;
 	
-	@OneToMany(mappedBy = "content")
-	private List<Image> images = new ArrayList<>();
-	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "account_id")

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 public class ContentDTO {
@@ -26,7 +28,6 @@ public class ContentDTO {
 	public ContentDTO(Content content) {
 		this.caption = content.getCaption();
 		this.address = content.getLocation().getAddress();
-		this.city = content.getLocation().getCity();
 		this.name = content.getLocation().getName();
 		this.lat = content.getLocation().getLat();
 		this.lng = content.getLocation().getLng();

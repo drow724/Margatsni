@@ -18,8 +18,6 @@ public class Location {
 	
 	private String address;
 	
-	private String city;
-	
 	private String name;
 	
 	private Double lat;

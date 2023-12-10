@@ -55,6 +55,7 @@ public class ShareService {
 
 	//@Retryable(maxAttempts = 3)
 	public List<Location> getLocationInfo(String accessToken) throws InterruptedException, ParseException {
+		System.out.println("userMediaUrl + accessToken = " + userMediaUrl + accessToken);
 		Map res = restTemplate.getForObject(userMediaUrl + accessToken, Map.class);
 
 		List<Map<String, Object>> data = (List<Map<String, Object>>) res.get("data");
@@ -62,47 +63,47 @@ public class ShareService {
 		List<String> urls = data.stream().map(d -> String.valueOf(d.get("permalink"))).collect(Collectors.toList());
 
 		List<CompletableFuture<Location>> dataList = urls.stream().map(url -> CompletableFuture.supplyAsync(() -> {
-					Location locationDTO = null;
-					try (Playwright playwright = Playwright.create()) {
+				Location locationDTO = null;
+				try (Playwright playwright = Playwright.create()) {
 
-						Browser context = playwright.chromium().launch(launchOptions);
+					Browser context = playwright.chromium().launch(launchOptions);
 
-						Page page = context.newPage();
+					Page page = context.newPage();
 
-						page.navigate(url);
+					page.navigate(url);
 
-						Response postResponse = page
-								.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/graphql"), () -> {
-								});
+					Response postResponse = page
+							.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/graphql"), () -> {
+							});
 
-						Map<String, Object> post = mapper.readValue(postResponse.text(), Map.class);
+					Map<String, Object> post = mapper.readValue(postResponse.text(), Map.class);
 
-						Map<String, Object> postData = (Map<String, Object>) post.get("data");
-						Map<String, Object> xdt_shortcode_media = (Map<String, Object>) postData.get("xdt_shortcode_media");
-						Map<String, Object> location = (Map<String, Object>) xdt_shortcode_media.get("location");
+					Map<String, Object> postData = (Map<String, Object>) post.get("data");
+					Map<String, Object> xdt_shortcode_media = (Map<String, Object>) postData.get("xdt_shortcode_media");
+					Map<String, Object> location = (Map<String, Object>) xdt_shortcode_media.get("location");
 
-						if(location == null) {
-							return locationDTO;
-						}
-						page.navigate("https://www.instagram.com/explore/locations/" + location.get("id") + "/?img_index=1");
-
-						Response locationResponse = page.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/v1/locations/web_info/?"), () -> {
-						});
-
-						Map<String, Object> locationData = mapper.readValue(locationResponse.text(), Map.class);
-						Map<String, Object> native_location_data = (Map<String, Object>) locationData.get("native_location_data");
-						Map<String, Object> location_info = (Map<String, Object>) native_location_data.get("location_info");
-
-						locationDTO = new Location(String.valueOf(location_info.get("location_address")), String.valueOf(location_info.get("name")),
-								Double.parseDouble(location_info.get("lat").toString()),
-								Double.parseDouble(location_info.get("lng").toString()));
-					} catch (JsonMappingException e) {
-						throw new RuntimeException(e);
-					} catch (JsonProcessingException e) {
-						throw new RuntimeException(e);
+					if(location == null) {
+						return locationDTO;
 					}
-					return locationDTO;
+					page.navigate("https://www.instagram.com/explore/locations/" + location.get("id") + "/?img_index=1");
+
+					Response locationResponse = page.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/v1/locations/web_info/?"), () -> {
+					});
+
+					Map<String, Object> locationData = mapper.readValue(locationResponse.text(), Map.class);
+					Map<String, Object> native_location_data = (Map<String, Object>) locationData.get("native_location_data");
+					Map<String, Object> location_info = (Map<String, Object>) native_location_data.get("location_info");
+
+					locationDTO = new Location(String.valueOf(location_info.get("location_address")), String.valueOf(location_info.get("name")),
+							Double.parseDouble(location_info.get("lat").toString()),
+							Double.parseDouble(location_info.get("lng").toString()));
+				} catch (JsonMappingException e) {
+					throw new RuntimeException(e);
+				} catch (JsonProcessingException e) {
+					throw new RuntimeException(e);
 				}
+				return locationDTO;
+			}
 		)).collect(Collectors.toList());
 
 		List<Location> locations = dataList.stream().map(output -> output.join()).collect(Collectors.toList());

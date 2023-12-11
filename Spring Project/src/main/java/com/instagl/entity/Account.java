@@ -32,17 +32,26 @@ public class Account {
 	private Long follow;
 	
 	private Long followed;
-	
+
+	private String access_token;
+
+	private String feed_id;
+
+	private String profile_img_path;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Content> contents = new ArrayList<>();
 	
-	public Account(String username, String profilePicUrl, String biography, Long follow, Long followed) {
+	public Account(String username, String profilePicUrl, String biography, Long follow, Long followed, String access_token, String feed_id, String profile_img_path) {
 		this.username = username;
 		this.profilePicUrl = profilePicUrl;
 		this.biography = biography;
 		this.follow = follow;
 		this.followed = followed;
+		this.access_token = access_token;
+		this.feed_id = feed_id;
+		this.profile_img_path = profile_img_path;
 	}
 	
 }

@@ -2,6 +2,7 @@ package com.instagl.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ public class LoginController {
     public void getLoginInfoWithGoogle(@RequestBody Object info) throws InterruptedException, ParseException {
         //TODO 구글 로그인
     }
+
     @CrossOrigin
     @GetMapping("accessToken")
     public Map<String, Object> loginWithInstagram(@RequestParam String code) throws InterruptedException, ParseException {
@@ -32,6 +34,10 @@ public class LoginController {
         login.add("client_id", "1202988193978178");
         login.add("code", code);
         Map<String, Object> response = restTemplate.postForObject("https://api.instagram.com/oauth/access_token", login, Map.class);
+
+        // TODO 인스타 유저 고유ID Name 프로필사진(서버에 저장) Response -> account Table
+
+
         return response;
     }
 }

@@ -7,7 +7,14 @@ import {
   clusterCountLayer,
   unclusteredPointLayer,
 } from "../components/layers";
-import { Map, Source, Layer, Marker, Popup } from "react-map-gl";
+import {
+  Map,
+  Source,
+  Layer,
+  Marker,
+  Popup,
+  NavigationControl,
+} from "react-map-gl";
 import Pin from "../components/Pin";
 import SwipeableTextMobileStepper from "../components/SwipeableTextMobileStepper";
 import { maxParallelImageRequests } from "mapbox-gl";
@@ -15,6 +22,9 @@ import bbox from "@turf/bbox";
 import styled from "styled-components";
 import { CircularProgress } from "@mui/material";
 import { Box } from "@mui/system";
+import Switch from "@mui/material/Switch";
+
+const label = { inputProps: { "aria-label": "Switch demo" } };
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiZHJvdzcyNCIsImEiOiJjbGI3dGpiZ3AwZGRvM3NvMnU5a2w3ZHh4In0.Ei81FJmfrOdiB2Rn2rlKyA";
@@ -143,7 +153,6 @@ function MapHook() {
         onClick={onClick}
       >
         {pins}
-
         {popupInfo && (
           <React.Fragment>
             <Popup
@@ -163,6 +172,28 @@ function MapHook() {
           </React.Fragment>
         )}
       </Map>
+      <div
+        style={{
+          position: "fixed",
+          width: "20%",
+          height: "100%",
+          margin: "0 auto",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          top: 0,
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+          transform: "translate(230%, -45%)",
+        }}
+      >
+        <Switch {...label} />
+        <Box sx={{ display: "flex" }}>
+          <CircularProgress color="secondary" />
+        </Box>
+      </div>
     </React.Fragment>
   );
 }

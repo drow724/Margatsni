@@ -27,7 +27,6 @@ public class LoginController {
         MultiValueMap<String, Object> login = new LinkedMultiValueMap<>();
         login.add("client_id", "1202988193978178");
         login.add("client_secret", "c05e2e3dd62e9c57ed074e28a50b9f72");
-
         login.add("grant_type", "authorization_code");
         login.add("redirect_uri", "https://localhost:3000/margatsni/login");
         login.add("client_id", "1202988193978178");

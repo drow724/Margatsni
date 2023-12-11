@@ -1,21 +1,24 @@
 package com.instagl.entity;
 
-import jakarta.persistence.Embeddable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Setter
 @Getter
-@Embeddable
-@Builder
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Location {
-	
+
+	@Id
+	private Long id;
+
 	private String address;
 	
 	private String name;
@@ -23,5 +26,16 @@ public class Location {
 	private Double lat;
 	
 	private Double lng;
-	
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "location")
+	List<Content> contents = new ArrayList<>();
+
+	public Location(Long id, String address, String name, Double lat, Double lng) {
+		this.id = id;
+		this.address = address;
+		this.name = name;
+		this.lat = lat;
+		this.lng = lng;
+	}
 }

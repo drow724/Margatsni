@@ -2,12 +2,14 @@ package com.instagl.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instagl.repository.LocationRepository;
 import com.microsoft.playwright.*;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,8 @@ public class ShareService {
 	private final ContentServie contentServie;
 
 	private final ImageService imageService;
+
+	private final LocationRepository locationRepository;
 
 	//@Retryable(maxAttempts = 3)
 	public List<Content> getLocationInfo(String accessToken) throws InterruptedException, ParseException {
@@ -68,6 +72,13 @@ public class ShareService {
 					if(location == null) {
 						return content;
 					}
+
+					Optional<Location> optional = locationRepository.findById(Long.parseLong(location.get("id").toString()));
+					if(optional.isPresent()) {
+						Location loc = optional.get();
+						return new Content(String.valueOf(d.get("caption")), loc);
+					}
+
 					page.navigate("https://www.instagram.com/explore/locations/" + location.get("id") + "/?img_index=1");
 
 					Response locationResponse = page.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/v1/locations/web_info/?"), () -> {
@@ -77,9 +88,11 @@ public class ShareService {
 					Map<String, Object> native_location_data = (Map<String, Object>) locationData.get("native_location_data");
 					Map<String, Object> location_info = (Map<String, Object>) native_location_data.get("location_info");
 
-					Location loc = new Location(String.valueOf(location_info.get("location_address")), String.valueOf(location_info.get("name")),
+					Location loc = new Location(Long.parseLong(location.get("id").toString()), String.valueOf(location_info.get("location_address")), String.valueOf(location_info.get("name")),
 							Double.parseDouble(location_info.get("lat").toString()),
 							Double.parseDouble(location_info.get("lng").toString()));
+
+					locationRepository.save(loc);
 
 					content = new Content(String.valueOf(d.get("caption")), loc);
 
@@ -88,6 +101,7 @@ public class ShareService {
 				} catch (JsonProcessingException e) {
 					throw new RuntimeException(e);
 				}
+
 				return content;
 			}
 		)).collect(Collectors.toList());

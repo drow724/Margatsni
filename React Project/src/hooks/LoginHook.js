@@ -21,6 +21,7 @@ function MapHook() {
 
   const [popup, setPopup] = useState(null);
   const [code, setCode] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
 
   useEffect(() => {
     if (!popup) {
@@ -59,10 +60,17 @@ function MapHook() {
     axios
       .get(`https://localhost:7060/login/accessToken?code=${code}`)
       .then((response) => {
-        console.log(response);
-        navigate(`/margatsni?code=${response.data.access_token}`);
+        setAccessToken(response.data.access_token);
       });
   }, [code]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
+
+    navigate(`/profile?code=${accessToken}`);
+  }, [accessToken, navigate]);
 
   return (
     <React.Fragment>

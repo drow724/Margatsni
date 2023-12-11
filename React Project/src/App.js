@@ -6,13 +6,11 @@ import LoginRoute from "./routes/LoginRoute";
 
 function App() {
   return (
-    <Router>
-      <Routes basename={process.env.PUBLIC_URL}>
-        <Route path={process.env.PUBLIC_URL} element={<MapRoute />} />
-        <Route
-          path={`${process.env.PUBLIC_URL}/login`}
-          element={<LoginRoute />}
-        />
+    <Router basename={process.env.PUBLIC_URL}>
+      <Routes>
+        <Route exact path="/" element={<MapRoute />} />
+        <Route exact path="/login" element={<LoginRoute />} />
+        <Route exact path="/profile" element={<MapRoute />} />
       </Routes>
     </Router>
   );

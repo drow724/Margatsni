@@ -4,6 +4,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.instagl.dto.ContentDTO;
 import com.instagl.entity.Content;
 import com.instagl.entity.Location;
 import com.instagl.service.ShareService;
@@ -27,9 +28,9 @@ public class ShareController {
 	
 	@CrossOrigin
 	@GetMapping
-	public List<Content> getFeed(@RequestParam String accessToken) throws InterruptedException, ParseException {
+	public List<ContentDTO> getFeed(@RequestParam String accessToken) throws InterruptedException, ParseException {
 
-		List<Content> contents = shareService.getLocationInfo(accessToken);
+		List<ContentDTO> contents = shareService.getLocationInfo(accessToken);
 		return contents;
 	}
 }

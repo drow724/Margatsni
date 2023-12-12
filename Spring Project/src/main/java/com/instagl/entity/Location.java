@@ -29,7 +29,7 @@ public class Location {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "location")
-	List<Content> contents = new ArrayList<>();
+	private List<Content> contents = new ArrayList<>();
 
 	public Location(Long id, String address, String name, Double lat, Double lng) {
 		this.id = id;

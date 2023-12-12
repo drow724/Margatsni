@@ -2,6 +2,7 @@ package com.instagl.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.instagl.dto.ImageDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -34,4 +35,5 @@ public class Image {
 	public Image(String url) {
 		this.url = url;
 	}
+
 }

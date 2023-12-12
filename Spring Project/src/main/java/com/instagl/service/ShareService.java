@@ -117,7 +117,7 @@ public class ShareService {
 		List<Content> contents = dataList.stream().map(output -> output.join()).filter(output -> output != null).collect(Collectors.toList());
 
 		List<CompletableFuture<ContentDTO>> contentDTOs = contents.stream().map(content -> CompletableFuture.supplyAsync(() -> {
-			Map<String, Object> response = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", content.getId().toString()), Map.class);
+			Map<String, Object> response = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", content.getId().toString()) + accessToken, Map.class);
 			if(response.get("children") == null) {
 				List<Image> images = new ArrayList<>();
 				images.add(new Image(String.valueOf(response.get("media_url"))));
@@ -129,7 +129,7 @@ public class ShareService {
 			List<String> ids = map.stream().map(d -> String.valueOf(d.get("id"))).collect(Collectors.toList());
 
 			List<CompletableFuture<Image>> imageFuture = ids.stream().map(id -> CompletableFuture.supplyAsync(() -> {
-				Map<String, Object> child = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", id), Map.class);
+				Map<String, Object> child = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", id) + accessToken, Map.class);
 				return new Image(String.valueOf(child.get("media_url")));
 			}, executor)).collect(Collectors.toList());
 

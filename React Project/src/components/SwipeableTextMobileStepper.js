@@ -24,32 +24,44 @@ function SwipeableTextMobileStepper({ info }) {
 
   const getImages = async (url) => {
     return await axios({
-      method: "post",
-      url: `http://localhost:7060/image`,
-      data: url,
-      responseType: "blob",
+      method: "get",
+      url: url,
     });
   };
 
   React.useEffect(() => {
     info.images.forEach((image) => {
-      getImages(image.url).then((response) => {
-        const url = window.URL.createObjectURL(response.data);
-        const img = React.createElement(Box, {
-          src: url,
-          component: "img",
-          sx: {
-            height: "100%",
-            display: "block",
-            maxWidth: 400,
-            overflow: "hidden",
-            width: "100%",
-          },
-          style: { WebkitUserDrag: "none" },
-        });
-        setLoaded((current) => current + 1);
-        setImages((current) => [...current, img]);
+      // getImages(image.url).then((response) => {
+      //   const url = window.URL.createObjectURL(response.data);
+      //   const img = React.createElement(Box, {
+      //     src: response,
+      //     component: "img",
+      //     sx: {
+      //       height: "100%",
+      //       display: "block",
+      //       maxWidth: 400,
+      //       overflow: "hidden",
+      //       width: "100%",
+      //     },
+      //     style: { WebkitUserDrag: "none" },
+      //   });
+      //   setLoaded((current) => current + 1);
+      //   setImages((current) => [...current, img]);
+      // });
+      const img = React.createElement(Box, {
+        src: image.url,
+        component: "img",
+        sx: {
+          height: "100%",
+          display: "block",
+          maxWidth: 400,
+          overflow: "hidden",
+          width: "100%",
+        },
+        style: { WebkitUserDrag: "none" },
       });
+      setLoaded((current) => current + 1);
+      setImages((current) => [...current, img]);
     });
   }, [info.images]);
 

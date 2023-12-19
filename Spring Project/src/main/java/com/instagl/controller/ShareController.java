@@ -29,8 +29,15 @@ public class ShareController {
 	@CrossOrigin
 	@GetMapping
 	public List<ContentDTO> getFeed(@RequestParam String accessToken) throws InterruptedException, ParseException {
-
 		List<ContentDTO> contents = shareService.getLocationInfo(accessToken);
 		return contents;
+	}
+
+	@CrossOrigin
+	@PostMapping(value = "/image", produces = MediaType.IMAGE_JPEG_VALUE)
+	public byte[] getImage(@RequestBody String url){
+
+		RestTemplate restTemplate = new RestTemplate();
+		return restTemplate.getForObject(URLDecoder.decode(url, StandardCharsets.UTF_8), byte[].class);
 	}
 }

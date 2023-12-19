@@ -53,7 +53,7 @@ public class ShareService {
 	private final LocationRepository locationRepository;
 
 	//@Retryable(maxAttempts = 3)
-	public List<ContentDTO> getLocationInfo(String accessToken) throws InterruptedException, ParseException {
+	public List<ContentDTO> getLocationInfo(String accessToken) {
 		System.out.println("userMediaUrl + accessToken = " + userMediaUrl + accessToken);
 		Map res = restTemplate.getForObject(userMediaUrl + accessToken, Map.class);
 

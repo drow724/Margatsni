@@ -1,49 +1,19 @@
 import axios from "axios";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ProgressBar } from "react-loader-spinner";
-import { useParams } from "react-router-dom";
-import {
-  clusterLayer,
-  clusterCountLayer,
-  unclusteredPointLayer,
-} from "../components/layers";
-import {
-  Map,
-  Source,
-  Layer,
-  Marker,
-  Popup,
-  NavigationControl,
-} from "react-map-gl";
+import React, { useMemo, useRef, useState } from "react";
+import { Marker } from "react-map-gl";
 import Pin from "../components/Pin";
-import SwipeableTextMobileStepper from "../components/SwipeableTextMobileStepper";
-import { maxParallelImageRequests } from "mapbox-gl";
 import bbox from "@turf/bbox";
-import styled from "styled-components";
-import { CircularProgress } from "@mui/material";
+import Map from "../components/Map";
 import { Box } from "@mui/system";
 import Switch from "@mui/material/Switch";
+import { CircularProgress } from "@mui/material";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-const MAPBOX_TOKEN =
-  "pk.eyJ1IjoiZHJvdzcyNCIsImEiOiJjbGI3dGpiZ3AwZGRvM3NvMnU5a2w3ZHh4In0.Ei81FJmfrOdiB2Rn2rlKyA";
-
-const username = "username";
-
-function MapHook() {
-  const url = new URL(window.location.href);
-
-  const searchParams = url.searchParams;
-  const code = searchParams.get("code");
-
+function MapHook({ accessToken }) {
   const [loading, setLoading] = useState(true);
 
   const [contents, setContents] = useState([]);
-
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(2);
 
   const [popupInfo, setPopupInfo] = useState(null);
 
@@ -64,26 +34,39 @@ function MapHook() {
     }
   };
 
+  const [bounds, setBounds] = useState([]);
+
   const setting = async () => {
-    const user = url.searchParams.get(username);
     await axios({
       method: "get",
-      url: `http://localhost:7060?accessToken=${code}`,
+      url: `http://localhost:7060?accessToken=${accessToken}`,
     }).then((response) => {
       setContents(response.data);
-      setLng(() => {
-        return (
-          response.data.reduce((acc, cur) => {
-            return (acc += cur.location.lng);
-          }, 0) / response.data.length
-        );
-      });
-      setLat(
-        response.data.reduce((acc, cur) => {
-          return (acc += cur.location.lat);
-        }, 0) / response.data.length
-      );
       setLoading(false);
+      const minLat = response.data.reduce((acc, cur) =>
+        cur.location.lat > acc.location.lat
+          ? acc.location.lat
+          : cur.location.lat
+      );
+      const minLng = response.data.reduce((acc, cur) =>
+        cur.location.lng > acc.location.lng
+          ? acc.location.lng
+          : cur.location.lng
+      );
+      const maxLat = response.data.reduce((acc, cur) =>
+        cur.location.lat < acc.location.lat
+          ? acc.location.lat
+          : cur.location.lat
+      );
+      const maxLng = response.data.reduce((acc, cur) =>
+        cur.location.lng < acc.location.lng
+          ? acc.location.lng
+          : cur.location.lng
+      );
+      setBounds([
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ]);
     });
   };
 
@@ -122,79 +105,41 @@ function MapHook() {
     [contents]
   );
 
-  return loading ? (
-    <React.Fragment>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          height: "100vh",
-          width: "100%",
-          justifyContent: "center",
-          backgroundColor: "#292929",
-        }}
-      >
-        <CircularProgress size={100} disableShrink />
+  const bottom = (
+    <div
+      style={{
+        position: "fixed",
+        width: "20%",
+        height: "100%",
+        margin: "0 auto",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        alignItems: "center",
+        transform: "translate(230%, -45%)",
+      }}
+    >
+      <Switch {...label} />
+      <Box sx={{ display: "flex" }}>
+        <CircularProgress color="secondary" />
       </Box>
-    </React.Fragment>
-  ) : (
-    <React.Fragment>
-      <Map
-        initialViewState={{
-          longitude: lng,
-          latitude: lat,
-          zoom: zoom,
-        }}
-        mapboxAccessToken={MAPBOX_TOKEN}
-        style={{ width: "100%", height: "100vh" }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-        interactiveLayerIds={[clusterLayer.id]}
-        ref={mapRef}
-        onClick={onClick}
-      >
-        {pins}
-        {popupInfo && (
-          <React.Fragment>
-            <Popup
-              anchor="top"
-              longitude={Number(popupInfo.location.lng)}
-              latitude={Number(popupInfo.location.lat)}
-              onClose={() => setPopupInfo(null)}
-              style={{
-                width: "100%",
-                borderRadius: 10,
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <SwipeableTextMobileStepper info={popupInfo} />
-            </Popup>
-          </React.Fragment>
-        )}
-      </Map>
-      <div
-        style={{
-          position: "fixed",
-          width: "20%",
-          height: "100%",
-          margin: "0 auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
-          transform: "translate(230%, -45%)",
-        }}
-      >
-        <Switch {...label} />
-        <Box sx={{ display: "flex" }}>
-          <CircularProgress color="secondary" />
-        </Box>
-      </div>
-    </React.Fragment>
+    </div>
+  );
+  return (
+    <Map
+      loading={loading}
+      bounds={bounds}
+      onClick={onClick}
+      pins={pins}
+      popupInfo={popupInfo}
+      setPopupInfo={setPopupInfo}
+      bottom={bottom}
+      ref={mapRef}
+    />
   );
 }
 

@@ -2,14 +2,15 @@ import MapHook from "../hooks/MapHook";
 import LoginHook from "../hooks/LoginHook";
 import "./MapRoute.css";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useState } from "react";
 const MapRoute = () => {
-  const currentUrl = window.location.href;
-  const searchParams = new URL(currentUrl).searchParams;
-  const code = searchParams.get("code");
+  const [accessToken, setAccessToken] = useState(null);
 
-  const isLogin = code ? true : false;
-  return isLogin ? <MapHook /> : <LoginHook />;
+  return accessToken ? (
+    <MapHook accessToken={accessToken} />
+  ) : (
+    <LoginHook setAccessToken={setAccessToken} />
+  );
 };
 
 export default MapRoute;

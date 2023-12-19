@@ -10,7 +10,6 @@ function App() {
       <Routes>
         <Route exact path="/" element={<MapRoute />} />
         <Route exact path="/login" element={<LoginRoute />} />
-        <Route exact path="/profile" element={<MapRoute />} />
       </Routes>
     </Router>
   );

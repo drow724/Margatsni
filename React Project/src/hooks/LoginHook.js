@@ -1,6 +1,5 @@
-import { Face } from "@mui/icons-material";
-import React, { useRef, useState, useMemo, useEffect } from "react";
-import { Map, Layer } from "react-map-gl";
+import React, { useState, useEffect } from "react";
+import Map from "../components/Map";
 import {
   FacebookLoginButton,
   InstagramLoginButton,
@@ -9,19 +8,9 @@ import {
 
 import axios from "axios";
 
-import { Form, useNavigate } from "react-router-dom";
-
-const MAPBOX_TOKEN =
-  "pk.eyJ1IjoiZHJvdzcyNCIsImEiOiJjbGI3dGpiZ3AwZGRvM3NvMnU5a2w3ZHh4In0.Ei81FJmfrOdiB2Rn2rlKyA";
-
-function MapHook() {
-  const navigate = useNavigate();
-
-  const mapRef = useRef();
-
+function MapHook({ setAccessToken }) {
   const [popup, setPopup] = useState(null);
   const [code, setCode] = useState(null);
-  const [accessToken, setAccessToken] = useState(null);
 
   useEffect(() => {
     if (!popup) {
@@ -64,51 +53,36 @@ function MapHook() {
       });
   }, [code]);
 
-  useEffect(() => {
-    if (!accessToken) {
-      return;
-    }
-
-    navigate(`/profile?code=${accessToken}`);
-  }, [accessToken, navigate]);
-
-  return (
-    <React.Fragment>
-      <Map
-        ref={mapRef}
-        mapboxAccessToken={MAPBOX_TOKEN}
-        style={{ width: "100%", height: "100vh", position: "fixed" }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-      ></Map>
-      <div
-        style={{
-          position: "fixed",
-          width: "20%",
-          height: "100%",
-          margin: "0 auto",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          top: 0,
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
+  const bottom = (
+    <div
+      style={{
+        position: "fixed",
+        width: "20%",
+        height: "100%",
+        margin: "0 auto",
+        left: 0,
+        right: 0,
+        bottom: 0,
+        top: 0,
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <InstagramLoginButton
+        onClick={() => {
+          const popup = window.open(
+            "https://api.instagram.com/oauth/authorize?client_id=1202988193978178&redirect_uri=https://localhost:3000/margatsni/login&response_type=code&scope=user_profile,user_media",
+            "인스타그램 로그인",
+            "popup=yes"
+          );
+          setPopup(popup);
         }}
-      >
-        <InstagramLoginButton
-          onClick={() => {
-            const popup = window.open(
-              "https://api.instagram.com/oauth/authorize?client_id=1202988193978178&redirect_uri=https://localhost:3000/margatsni/login&response_type=code&scope=user_profile,user_media",
-              "인스타그램 로그인",
-              "popup=yes"
-            );
-            setPopup(popup);
-          }}
-        />
-      </div>
-    </React.Fragment>
+      />
+    </div>
   );
+  return <Map bottom={bottom} />;
 }
 
 export default MapHook;

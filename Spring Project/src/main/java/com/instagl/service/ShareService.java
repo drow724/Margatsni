@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +53,19 @@ public class ShareService {
 
 	private final LocationRepository locationRepository;
 
+	private final Predicate<String> isBody = (body) -> {
+		Map<String, Object> post = null;
+		try {
+			post = mapper.readValue(body, Map.class);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+
+		Map<String, Object> postData = (Map<String, Object>) post.get("data");
+		Map<String, Object> xdt_shortcode_media = (Map<String, Object>) postData.get("xdt_shortcode_media");
+		return xdt_shortcode_media != null;
+	};
+
 	//@Retryable(maxAttempts = 3)
 	public List<ContentDTO> getLocationInfo(String accessToken) {
 		System.out.println("userMediaUrl + accessToken = " + userMediaUrl + accessToken);
@@ -70,8 +84,7 @@ public class ShareService {
 				page.navigate(String.valueOf(d.get("permalink")));
 
 				Response postResponse = page
-						.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/graphql"), () -> {
-						});
+						.waitForResponse(response -> isBody.test(response.text()) && response.url().contains("https://www.instagram.com/api/graphql"), () -> {});
 
 				Map<String, Object> post = mapper.readValue(postResponse.text(), Map.class);
 

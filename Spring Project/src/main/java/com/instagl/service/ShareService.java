@@ -14,12 +14,16 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instagl.TypeUtil;
 import com.instagl.dto.ContentDTO;
 import com.instagl.entity.Image;
 import com.instagl.repository.LocationRepository;
 import com.microsoft.playwright.*;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import com.instagl.entity.Content;
@@ -53,43 +57,33 @@ public class ShareService {
 
 	private final LocationRepository locationRepository;
 
-	private final Predicate<String> isBody = (body) -> {
-		Map<String, Object> post = null;
-		try {
-			post = mapper.readValue(body, Map.class);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-
-		Map<String, Object> postData = (Map<String, Object>) post.get("data");
-		Map<String, Object> xdt_shortcode_media = (Map<String, Object>) postData.get("xdt_shortcode_media");
-		return xdt_shortcode_media != null;
-	};
-
 	//@Retryable(maxAttempts = 3)
 	public List<ContentDTO> getLocationInfo(String accessToken) {
-		System.out.println("userMediaUrl + accessToken = " + userMediaUrl + accessToken);
-		Map res = restTemplate.getForObject(userMediaUrl + accessToken, Map.class);
+		Map<String, Object> res = restTemplate.exchange(userMediaUrl + accessToken, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), TypeUtil.MAP).getBody();
 
 		List<Map<String, Object>> data = (List<Map<String, Object>>) res.get("data");
 
 		List<CompletableFuture<Content>> dataList = data.stream().map(d -> CompletableFuture.supplyAsync(() -> {
 			Content content = null;
-			try (Playwright playwright = Playwright.create()) {
 
-				Browser context = playwright.chromium().launch(launchOptions);
-
+			try (Playwright playwright = Playwright.create();
+				 Browser context = playwright.chromium().launch(launchOptions)) {
 				Page page = context.newPage();
 
 				page.navigate(String.valueOf(d.get("permalink")));
 
 				Response postResponse = page
-						.waitForResponse(response -> isBody.test(response.text()) && response.url().contains("https://www.instagram.com/api/graphql"), () -> {});
+						.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/graphql"), () -> {});
 
-				Map<String, Object> post = mapper.readValue(postResponse.text(), Map.class);
+				Map<String, Object> post = mapper.readValue(postResponse.text(), TypeUtil.JSON_MAP);
 
 				Map<String, Object> postData = (Map<String, Object>) post.get("data");
 				Map<String, Object> xdt_shortcode_media = (Map<String, Object>) postData.get("xdt_shortcode_media");
+
+				if(xdt_shortcode_media == null) {
+					throw new IllegalStateException("공개 게시물이 없습니다.");
+				}
+
 				Map<String, Object> location = (Map<String, Object>) xdt_shortcode_media.get("location");
 
 				if(location == null) {
@@ -97,6 +91,7 @@ public class ShareService {
 				}
 
 				Optional<Location> optional = locationRepository.findById(Long.parseLong(location.get("id").toString()));
+
 				if(optional.isPresent()) {
 					Location loc = optional.get();
 					return new Content(Long.parseLong(d.get("id").toString()), String.valueOf(d.get("caption")), loc);

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instagl.RestTemplateUtil;
 import com.instagl.TypeUtil;
 import com.instagl.dto.ContentDTO;
 import com.instagl.entity.Image;
@@ -59,7 +60,7 @@ public class ShareService {
 
 	//@Retryable(maxAttempts = 3)
 	public List<ContentDTO> getLocationInfo(String accessToken) {
-		Map<String, Object> res = restTemplate.exchange(userMediaUrl + accessToken, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()), TypeUtil.MAP).getBody();
+		Map<String, Object> res = restTemplate.exchange(userMediaUrl + accessToken, HttpMethod.GET, RestTemplateUtil.DEFAULT_HTTP_ENTITY, TypeUtil.MAP).getBody();
 
 		List<Map<String, Object>> data = (List<Map<String, Object>>) res.get("data");
 
@@ -113,19 +114,21 @@ public class ShareService {
 
 				content = new Content(Long.parseLong(d.get("id").toString()), String.valueOf(d.get("caption")), loc);
 
-			} catch (JsonMappingException e) {
-				throw new RuntimeException(e);
 			} catch (JsonProcessingException e) {
 				throw new RuntimeException(e);
 			}
 
 			return content;
-		}, executor)).collect(Collectors.toList());
+		}, executor)).toList();
 
 		List<Content> contents = dataList.stream().map(output -> output.join()).filter(output -> output != null).collect(Collectors.toList());
 
 		List<CompletableFuture<ContentDTO>> contentDTOs = contents.stream().map(content -> CompletableFuture.supplyAsync(() -> {
-			Map<String, Object> response = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", content.getId().toString()) + accessToken, Map.class);
+			Map<String, Object> response =
+					restTemplate.exchange(mediaUrl.replaceAll("\\{id\\}", content.getId().toString()) + accessToken,
+									HttpMethod.GET, RestTemplateUtil.DEFAULT_HTTP_ENTITY, TypeUtil.MAP)
+							.getBody();
+
 			if(response.get("children") == null) {
 				List<Image> images = new ArrayList<>();
 				images.add(new Image(String.valueOf(response.get("media_url"))));
@@ -137,14 +140,15 @@ public class ShareService {
 			List<String> ids = map.stream().map(d -> String.valueOf(d.get("id"))).collect(Collectors.toList());
 
 			List<CompletableFuture<Image>> imageFuture = ids.stream().map(id -> CompletableFuture.supplyAsync(() -> {
-				Map<String, Object> child = restTemplate.getForObject(mediaUrl.replaceAll("\\{id\\}", id) + accessToken, Map.class);
+				Map<String, Object> child = restTemplate.exchange(mediaUrl.replaceAll("\\{id\\}", id) + accessToken, HttpMethod.GET, RestTemplateUtil.DEFAULT_HTTP_ENTITY, TypeUtil.MAP)
+						.getBody();
 				return new Image(String.valueOf(child.get("media_url")));
-			}, executor)).collect(Collectors.toList());
+			}, executor)).toList();
 
-			List<Image> images = imageFuture.stream().map(output -> output.join()).collect(Collectors.toList());
+			List<Image> images = imageFuture.stream().map(CompletableFuture::join).collect(Collectors.toList());
 			return new ContentDTO(content, images);
-		}, executor)).collect(Collectors.toList());
+		}, executor)).toList();
 
-		return contentDTOs.stream().map(output -> output.join()).collect(Collectors.toList());
+		return contentDTOs.stream().map(CompletableFuture::join).collect(Collectors.toList());
 	}
 }

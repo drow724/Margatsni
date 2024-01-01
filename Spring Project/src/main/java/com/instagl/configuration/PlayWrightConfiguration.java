@@ -12,7 +12,7 @@ public class PlayWrightConfiguration {
 	@Bean
 	public BrowserType.LaunchOptions launchOptions() {
 		BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
-		launchOptions.headless = true;
+		launchOptions.headless = Boolean.TRUE;
 		return launchOptions;
 	}
 	

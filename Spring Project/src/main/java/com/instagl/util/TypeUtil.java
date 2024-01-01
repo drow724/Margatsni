@@ -1,4 +1,4 @@
-package com.instagl;
+package com.instagl.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.core.ParameterizedTypeReference;

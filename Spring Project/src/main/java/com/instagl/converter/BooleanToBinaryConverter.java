@@ -1,4 +1,4 @@
-package com.instagl;
+package com.instagl.converter;
 
 import jakarta.persistence.AttributeConverter;
 

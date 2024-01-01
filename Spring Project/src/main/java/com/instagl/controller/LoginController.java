@@ -1,6 +1,6 @@
 package com.instagl.controller;
 
-import com.instagl.TypeUtil;
+import com.instagl.util.TypeUtil;
 import com.instagl.dto.UserDTO;
 import com.instagl.entity.Account;
 import com.instagl.service.AccountService;
@@ -8,14 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController

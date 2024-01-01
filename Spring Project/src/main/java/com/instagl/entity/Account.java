@@ -5,11 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.instagl.BooleanToBinaryConverter;
+import com.instagl.MemberGrade;
+import com.instagl.converter.BooleanToBinaryConverter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Convert;
 import lombok.AccessLevel;
@@ -37,6 +36,8 @@ public class Account {
 	private String feed_id;
 
 	private String profile_img_path;
+
+	private MemberGrade memberGrade = MemberGrade.NORMAL;
 
 	@Convert(converter = BooleanToBinaryConverter.class)
 	private Boolean updating;

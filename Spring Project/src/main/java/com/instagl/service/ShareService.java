@@ -7,23 +7,17 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instagl.RestTemplateUtil;
-import com.instagl.TypeUtil;
+import com.instagl.util.RestTemplateUtil;
+import com.instagl.util.TypeUtil;
 import com.instagl.dto.ContentDTO;
 import com.instagl.entity.Image;
 import com.instagl.repository.LocationRepository;
 import com.microsoft.playwright.*;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 

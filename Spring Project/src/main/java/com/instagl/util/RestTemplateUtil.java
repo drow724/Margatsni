@@ -1,4 +1,4 @@
-package com.instagl;
+package com.instagl.util;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

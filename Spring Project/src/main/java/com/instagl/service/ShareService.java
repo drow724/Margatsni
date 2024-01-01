@@ -151,4 +151,8 @@ public class ShareService {
 
 		return contentDTOs.stream().map(CompletableFuture::join).collect(Collectors.toList());
 	}
+
+	public void updateFeed() {
+
+	}
 }

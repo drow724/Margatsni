@@ -49,7 +49,7 @@ function MapHook({ setAccessToken }) {
     axios
       .get(`https://localhost:7060/login/accessToken?code=${code}`)
       .then((response) => {
-        setAccessToken(response.data.access_token);
+        setAccessToken(response.data.accessToken);
       });
   }, [code]);
 

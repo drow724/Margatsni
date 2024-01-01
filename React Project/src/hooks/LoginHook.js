@@ -8,7 +8,7 @@ import {
 
 import axios from "axios";
 
-function MapHook({ setAccessToken }) {
+function LoginHook({ setAccessToken, setUpdating }) {
   const [popup, setPopup] = useState(null);
   const [code, setCode] = useState(null);
 
@@ -50,6 +50,7 @@ function MapHook({ setAccessToken }) {
       .get(`https://localhost:7060/login/accessToken?code=${code}`)
       .then((response) => {
         setAccessToken(response.data.accessToken);
+        setUpdating(response.data.updating);
       });
   }, [code]);
 
@@ -85,4 +86,4 @@ function MapHook({ setAccessToken }) {
   return <Map bottom={bottom} />;
 }
 
-export default MapHook;
+export default LoginHook;

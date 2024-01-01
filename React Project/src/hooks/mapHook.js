@@ -7,10 +7,16 @@ import Map from "../components/Map";
 import { Box } from "@mui/system";
 import Switch from "@mui/material/Switch";
 import { CircularProgress } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import IconButton from "@mui/material/IconButton";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-function MapHook({ accessToken }) {
+const handleClick = () => {
+  console.log("click");
+};
+
+function MapHook({ accessToken, updating }) {
   const [loading, setLoading] = useState(true);
 
   const [contents, setContents] = useState([]);
@@ -123,10 +129,18 @@ function MapHook({ accessToken }) {
         transform: "translate(230%, -45%)",
       }}
     >
-      <Switch {...label} />
-      <Box sx={{ display: "flex" }}>
-        <CircularProgress color="secondary" />
-      </Box>
+      <IconButton aria-label="delete" onClick={handleClick}>
+        <RefreshIcon
+        //checked={checked}
+        // {...label}
+        />
+      </IconButton>
+
+      {updating && (
+        <Box sx={{ display: "flex" }}>
+          <CircularProgress color="secondary" />
+        </Box>
+      )}
     </div>
   );
   return (

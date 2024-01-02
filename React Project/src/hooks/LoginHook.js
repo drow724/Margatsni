@@ -8,7 +8,7 @@ import {
 
 import axios from "axios";
 
-function LoginHook({ setAccessToken, setUpdating }) {
+function LoginHook({ setAccessToken, setUpdating, setId }) {
   const [popup, setPopup] = useState(null);
   const [code, setCode] = useState(null);
 
@@ -27,19 +27,17 @@ function LoginHook({ setAccessToken, setUpdating }) {
       if (code) {
         console.log(`The popup URL has URL code param = ${code}`);
         setCode(code);
+        popup.close();
+        setPopup(null);
       }
-      popup?.close();
-      setPopup(null);
     };
 
     window.addEventListener("message", githubOAuthCodeListener, false);
 
     return () => {
       window.removeEventListener("message", githubOAuthCodeListener);
-      popup?.close();
-      setPopup(null);
     };
-  }, [popup]);
+  }, [code, popup]);
 
   useEffect(() => {
     if (!code) {
@@ -51,6 +49,7 @@ function LoginHook({ setAccessToken, setUpdating }) {
       .then((response) => {
         setAccessToken(response.data.accessToken);
         setUpdating(response.data.updating);
+        setId(response.data.id);
       });
   }, [code]);
 

@@ -12,7 +12,7 @@ import IconButton from "@mui/material/IconButton";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-function MapHook({ accessToken, updating }) {
+function MapHook({ accessToken, updating, id }) {
   const [loading, setLoading] = useState(true);
 
   const handleClick = async () => {
@@ -20,7 +20,12 @@ function MapHook({ accessToken, updating }) {
     setLoading(true);
     await axios({
       method: "patch",
-      url: `http://localhost:7060`,
+      url: `https://localhost:7060`,
+      data: {
+        id,
+        accessToken,
+        updating,
+      },
     });
   };
 
@@ -50,7 +55,7 @@ function MapHook({ accessToken, updating }) {
   const setting = async () => {
     await axios({
       method: "get",
-      url: `http://localhost:7060?accessToken=${accessToken}`,
+      url: `https://localhost:7060?accessToken=${accessToken}`,
     }).then((response) => {
       setContents(response.data);
       setLoading(false);

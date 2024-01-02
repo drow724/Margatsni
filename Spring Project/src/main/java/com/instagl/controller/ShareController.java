@@ -38,7 +38,7 @@ public class ShareController {
 
 	@CrossOrigin
 	@PatchMapping
-	public Boolean updateFeed(@RequestParam UserDTO userDTO) {
+	public Boolean updateFeed(@RequestBody UserDTO userDTO) {
 		if(userDTO.getUpdating()) {
 			throw new IllegalStateException("업데이트 중입니다.");
 		}

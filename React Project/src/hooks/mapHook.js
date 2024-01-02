@@ -50,7 +50,7 @@ function MapHook({ accessToken, updating }) {
       setContents(response.data);
       setLoading(false);
 
-      const latList = response.data.map((d) => d.location.lng);
+      const latList = response.data.map((d) => d.location.lat);
 
       const minLat = latList.reduce((acc, cur) =>
         cur.location.lat > acc.location.lat
@@ -78,7 +78,6 @@ function MapHook({ accessToken, updating }) {
           : cur.location.lng
       );
 
-      console.log(minLat, minLng, maxLat, maxLng);
       setBounds([
         [minLng, minLat],
         [maxLng, maxLat],

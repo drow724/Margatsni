@@ -8,7 +8,7 @@ import {
 
 import axios from "axios";
 
-function LoginHook({ setAccessToken, setUpdating, setId }) {
+function LoginHook({ setAccessToken, setUpdating, setFeedId }) {
   const [popup, setPopup] = useState(null);
   const [code, setCode] = useState(null);
 
@@ -49,7 +49,7 @@ function LoginHook({ setAccessToken, setUpdating, setId }) {
       .then((response) => {
         setAccessToken(response.data.accessToken);
         setUpdating(response.data.updating);
-        setId(response.data.id);
+        setFeedId(response.data.feedId);
       });
   }, [code]);
 

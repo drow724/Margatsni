@@ -12,21 +12,22 @@ import IconButton from "@mui/material/IconButton";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
-function MapHook({ accessToken, updating, id }) {
+function MapHook({ accessToken, updating, feedId }) {
   const [loading, setLoading] = useState(true);
 
   const handleClick = async () => {
     console.log("click");
     setLoading(true);
+    console.log(feedId);
     await axios({
       method: "patch",
       url: `https://localhost:7060`,
       data: {
-        id,
+        feedId,
         accessToken,
         updating,
       },
-    });
+    }).then((response) => setLoading(false));
   };
 
   const [contents, setContents] = useState([]);

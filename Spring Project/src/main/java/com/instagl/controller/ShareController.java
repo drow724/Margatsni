@@ -43,7 +43,7 @@ public class ShareController {
 			throw new IllegalStateException("업데이트 중입니다.");
 		}
 
-		accountService.changeUpdateState(userDTO.getId());
+		accountService.changeUpdateState(userDTO.getFeedId());
 
 		executor.execute(shareService::updateFeed);
 

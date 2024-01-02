@@ -24,9 +24,13 @@ public class AccountService {
 		return accountRepository.save(account);
 	}
 
-	public void changeUpdateState(Long id) {
-		Account account = accountRepository.findById(id).orElseThrow(() -> new NoSuchElementException("계정이 존재하지 않습니다."));
+	public void changeUpdateState(String feedId) {
+		Account account = accountRepository.findByFeedId(feedId).orElseThrow(() -> new NoSuchElementException("계정이 존재하지 않습니다."));
 		account.changeUpdating();
 		accountRepository.save(account);
 	}
+
+    public Optional<Account> getAccountByFeedId(String feeId) {
+		return accountRepository.findByFeedId(feeId);
+    }
 }

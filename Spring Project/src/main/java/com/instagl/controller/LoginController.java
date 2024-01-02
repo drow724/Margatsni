@@ -53,7 +53,7 @@ public class LoginController {
         String id = optionalId.get().toString();
 
         // TODO 인스타 유저 고유ID Name 프로필사진(서버에 저장) Response -> account Table
-        Account account = accountService.getAccount(Long.parseLong(id))
+        Account account = accountService.getAccountByFeedId(id)
                 .orElseGet(() -> accountService.save(new Account("", "", "",0L, 0L, id, "", Boolean.FALSE)));
 
         return new UserDTO(id, responseByAccToken, account);

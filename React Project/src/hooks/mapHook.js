@@ -49,26 +49,36 @@ function MapHook({ accessToken, updating }) {
     }).then((response) => {
       setContents(response.data);
       setLoading(false);
-      const minLat = response.data.reduce((acc, cur) =>
+
+      const latList = response.data.map((d) => d.location.lng);
+
+      const minLat = latList.reduce((acc, cur) =>
         cur.location.lat > acc.location.lat
           ? acc.location.lat
           : cur.location.lat
       );
-      const minLng = response.data.reduce((acc, cur) =>
-        cur.location.lng > acc.location.lng
-          ? acc.location.lng
-          : cur.location.lng
-      );
-      const maxLat = response.data.reduce((acc, cur) =>
+
+      const maxLat = latList.reduce((acc, cur) =>
         cur.location.lat < acc.location.lat
           ? acc.location.lat
           : cur.location.lat
       );
-      const maxLng = response.data.reduce((acc, cur) =>
+
+      const lngList = response.data.map((d) => d.location.lng);
+
+      const minLng = lngList.reduce((acc, cur) =>
+        cur.location.lng > acc.location.lng
+          ? acc.location.lng
+          : cur.location.lng
+      );
+
+      const maxLng = lngList.reduce((acc, cur) =>
         cur.location.lng < acc.location.lng
           ? acc.location.lng
           : cur.location.lng
       );
+
+      console.log(minLat, minLng, maxLat, maxLng);
       setBounds([
         [minLng, minLat],
         [maxLng, maxLat],

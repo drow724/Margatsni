@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instagl.dto.UserDTO;
+import com.instagl.entity.Account;
 import com.instagl.util.RestTemplateUtil;
 import com.instagl.util.TypeUtil;
 import com.instagl.dto.ContentDTO;
@@ -146,7 +148,7 @@ public class ShareService {
 		return contentDTOs.stream().map(CompletableFuture::join).collect(Collectors.toList());
 	}
 
-	public void updateFeed() {
-
+	public void updateFeed(Account account) {
+		account.changeUpdating();
 	}
 }

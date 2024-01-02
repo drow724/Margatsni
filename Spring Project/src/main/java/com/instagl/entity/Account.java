@@ -56,6 +56,6 @@ public class Account {
 	}
 
 	public void changeUpdating() {
-		this.updating = Boolean.TRUE;
+		this.updating = !this.updating;
 	}
 }

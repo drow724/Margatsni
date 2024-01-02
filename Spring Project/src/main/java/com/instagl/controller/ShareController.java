@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.instagl.dto.ContentDTO;
 import com.instagl.dto.UserDTO;
+import com.instagl.entity.Account;
 import com.instagl.service.ShareService;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.MediaType;
@@ -43,9 +44,9 @@ public class ShareController {
 			throw new IllegalStateException("업데이트 중입니다.");
 		}
 
-		accountService.changeUpdateState(userDTO.getFeedId());
+		Account account = accountService.changeUpdateState(userDTO.getFeedId());
 
-		executor.execute(shareService::updateFeed);
+		executor.execute(() -> shareService.updateFeed(account));
 
 		return Boolean.TRUE;
 	}

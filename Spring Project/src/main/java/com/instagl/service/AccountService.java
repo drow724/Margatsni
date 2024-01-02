@@ -24,10 +24,11 @@ public class AccountService {
 		return accountRepository.save(account);
 	}
 
-	public void changeUpdateState(String feedId) {
+	public Account changeUpdateState(String feedId) {
 		Account account = accountRepository.findByFeedId(feedId).orElseThrow(() -> new NoSuchElementException("계정이 존재하지 않습니다."));
 		account.changeUpdating();
 		accountRepository.save(account);
+		return account;
 	}
 
     public Optional<Account> getAccountByFeedId(String feeId) {

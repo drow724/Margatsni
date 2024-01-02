@@ -40,10 +40,11 @@ public class LoginController {
         login.add("redirect_uri", "https://localhost:3000/margatsni/login");
         login.add("client_id", "1202988193978178");
         login.add("code", code);
-        Map<String, Object> response = restTemplate.exchange("https://api.instagram.com/oauth/access_token", HttpMethod.POST, new HttpEntity<>(login), TypeUtil.MAP)
+        Map<String, Object> responseByAccToken = restTemplate.exchange("https://api.instagram.com/oauth/access_token", HttpMethod.POST, new HttpEntity<>(login), TypeUtil.MAP)
                 .getBody();
 
-        Optional<Object> optionalId = Optional.ofNullable(response.get("user_id"));
+        System.out.println("response.toString() = " + responseByAccToken.toString());
+        Optional<Object> optionalId = Optional.ofNullable(responseByAccToken.get("user_id"));
 
         if(optionalId.isEmpty()) {
             throw new IllegalStateException("계정 오류입니다.");
@@ -53,8 +54,8 @@ public class LoginController {
 
         // TODO 인스타 유저 고유ID Name 프로필사진(서버에 저장) Response -> account Table
         Account account = accountService.getAccount(Long.parseLong(id))
-                .orElseGet(() -> accountService.save(new Account(Long.parseLong(id), "", "", "",0L, 0L,"", "", Boolean.FALSE)));
+                .orElseGet(() -> accountService.save(new Account("", "", "",0L, 0L, id, "", Boolean.FALSE)));
 
-        return new UserDTO(id, response, account);
+        return new UserDTO(id, responseByAccToken, account);
     }
 }

@@ -7,10 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.instagl.MemberGrade;
 import com.instagl.converter.BooleanToBinaryConverter;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Convert;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class Account {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	private String username;
@@ -33,9 +31,9 @@ public class Account {
 	
 	private Long followed;
 
-	private String feed_id;
+	private String feedId;
 
-	private String profile_img_path;
+	private String profileImgPath;
 
 	private MemberGrade memberGrade = MemberGrade.NORMAL;
 
@@ -46,15 +44,14 @@ public class Account {
 	@OneToMany(mappedBy = "account")
 	List<Content> contents = new ArrayList<>();
 	
-	public Account(Long id, String username, String profilePicUrl, String biography, Long follow, Long followed, String feed_id, String profile_img_path, Boolean updating) {
-		this.id = id;
+	public Account(String username, String profilePicUrl, String biography, Long follow, Long followed, String feedId, String profileImgPath, Boolean updating) {
 		this.username = username;
 		this.profilePicUrl = profilePicUrl;
 		this.biography = biography;
 		this.follow = follow;
 		this.followed = followed;
-		this.feed_id = feed_id;
-		this.profile_img_path = profile_img_path;
+		this.feedId = feedId;
+		this.profileImgPath = profileImgPath;
 		this.updating = updating;
 	}
 

@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import com.instagl.dto.ContentDTO;
 import com.instagl.dto.UserDTO;
@@ -39,7 +38,7 @@ public class ShareController {
 
 	@CrossOrigin
 	@PatchMapping
-	public Boolean updateFeed(@RequestBody UserDTO userDTO) {
+	public UserDTO updateFeed(@RequestBody UserDTO userDTO) {
 		if(userDTO.getUpdating()) {
 			throw new IllegalStateException("업데이트 중입니다.");
 		}
@@ -48,7 +47,7 @@ public class ShareController {
 
 		executor.execute(() -> shareService.updateFeed(account));
 
-		return Boolean.TRUE;
+		return new UserDTO(account.getFeedId(), userDTO.getAccessToken(), account);
 	}
 
 	@CrossOrigin

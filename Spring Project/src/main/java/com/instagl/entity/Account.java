@@ -1,7 +1,9 @@
 package com.instagl.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,9 +13,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
 
@@ -34,6 +39,9 @@ public class Account {
 	private String feedId;
 
 	private String profileImgPath;
+
+	@LastModifiedDate
+	private LocalDateTime lastModifyingDate;
 
 	private MemberGrade memberGrade = MemberGrade.NORMAL;
 

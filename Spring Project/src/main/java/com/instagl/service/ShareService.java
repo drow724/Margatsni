@@ -150,5 +150,6 @@ public class ShareService {
 
 	public void updateFeed(Account account) {
 		account.changeUpdating();
+		accountService.save(account);
 	}
 }

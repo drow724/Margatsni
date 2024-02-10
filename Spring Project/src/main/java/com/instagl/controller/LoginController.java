@@ -62,13 +62,13 @@ public class LoginController {
         Map<String, Object> responseUserName = restTemplate.exchange(builder.build(), HttpMethod.GET, new HttpEntity<>(login), TypeUtil.MAP)
                 .getBody();
 
-        System.out.println("responseUserName = " + responseUserName);
+        Map<String, Object> profileInfo = accountService.getProfileInfo(responseUserName.get("username"));
 
         String id = optionalId.get().toString();
 
         // TODO 인스타 유저 고유ID Name 프로필사진(서버에 저장) Response -> account Table
         Account account = accountService.getAccountByFeedId(id)
-                .orElseGet(() -> accountService.save(new Account(String.valueOf(responseUserName.get("username")), "", "",0L, 0L, id, "", Boolean.FALSE)));
+                .orElseGet(() -> accountService.save(new Account(String.valueOf(responseUserName.get("username")), profileInfo.get("profilePicUrl").toString(), profileInfo.get("biography").toString(), Long.parseLong(profileInfo.get("following").toString()), Long.parseLong(profileInfo.get("follower").toString()), id, "", Boolean.FALSE)));
 
         return new UserDTO(id, responseByAccToken, account);
     }

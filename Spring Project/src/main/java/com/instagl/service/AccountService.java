@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.instagl.util.CommonUtil;
 import com.instagl.util.TypeUtil;
 import com.microsoft.playwright.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +21,6 @@ import com.instagl.repository.AccountRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
-
-import static com.instagl.constant.AccountConstant.FILE_DIR_PATH;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +42,9 @@ public class AccountService {
 	}
 
 	public Account save(Account account) {
+		// 프로필 이미지 저장(기본 프로필일 경우에도 저장)
+		this.saveProfileImageFile(account.getProfilePicUrl(), account.getProfileImgPath());
+
 		return accountRepository.save(account);
 	}
 
@@ -97,9 +99,9 @@ public class AccountService {
 		return resultData;
     }
 
-	public String saveProfileImageFile(String profileImageUrl, String fileName) {
+	public void saveProfileImageFile(String profileImageUrl, String fileName) {
 		try (BufferedInputStream in = new BufferedInputStream(new URL(profileImageUrl).openStream());
-			 FileOutputStream fileOutputStream = new FileOutputStream(FILE_DIR_PATH + fileName)) {
+			 FileOutputStream fileOutputStream = new FileOutputStream(fileName)) {
 
 			byte dataBuffer[] = new byte[1024];
 			int bytesRead;
@@ -109,8 +111,6 @@ public class AccountService {
 
 			in.close();
 			fileOutputStream.close();
-
-			return FILE_DIR_PATH + fileName;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

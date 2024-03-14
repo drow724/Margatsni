@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.instagl.constant.AccountConstant.FILE_DIR_PATH;
+
 @RestController
 @RequestMapping("/login/")
 @RequiredArgsConstructor
@@ -68,8 +70,8 @@ public class LoginController {
 
         // 프로필 정보 크롤링
         Map<String, Object> profileInfo = accountService.getProfileInfo(responseUserName.get("username"));
-        // 프로필 이미지 다운로드(기본 프로필일 경우에도 저장)
-        String savedProfileImgPath = accountService.saveProfileImageFile(profileInfo.get("profilePicUrl").toString(), CommonUtil.getTodayInSeconds() + "_" + id + ".jpg");
+        // 로컬 프로필 저장경로
+        String savedProfileImgPath = FILE_DIR_PATH + CommonUtil.getTodayInSeconds() + "_" + id + ".jpg";
 
         // 유저 고유ID Name 프로필이미지 Response -> account Table
         Account account = accountService.getAccountByFeedId(id)

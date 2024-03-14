@@ -1,5 +1,6 @@
 package com.instagl.controller;
 
+import com.instagl.util.CommonUtil;
 import com.instagl.util.TypeUtil;
 import com.instagl.dto.UserDTO;
 import com.instagl.entity.Account;
@@ -46,6 +47,7 @@ public class LoginController {
         login.add("redirect_uri", "https://localhost:3000/margatsni/login");
         login.add("client_id", "1202988193978178");
         login.add("code", code);
+
         Map<String, Object> responseByAccToken = restTemplate.exchange("https://api.instagram.com/oauth/access_token", HttpMethod.POST, new HttpEntity<>(login), TypeUtil.MAP)
                 .getBody();
 
@@ -62,13 +64,25 @@ public class LoginController {
         Map<String, Object> responseUserName = restTemplate.exchange(builder.build(), HttpMethod.GET, new HttpEntity<>(login), TypeUtil.MAP)
                 .getBody();
 
-        Map<String, Object> profileInfo = accountService.getProfileInfo(responseUserName.get("username"));
-
         String id = optionalId.get().toString();
 
-        // TODO 인스타 유저 고유ID Name 프로필사진(서버에 저장) Response -> account Table
+        // 프로필 정보 크롤링
+        Map<String, Object> profileInfo = accountService.getProfileInfo(responseUserName.get("username"));
+        // 프로필 이미지 다운로드(기본 프로필일 경우에도 저장)
+        String savedProfileImgPath = accountService.saveProfileImageFile(profileInfo.get("profilePicUrl").toString(), CommonUtil.getTodayInSeconds() + "_" + id + ".jpg");
+
+        // 유저 고유ID Name 프로필이미지 Response -> account Table
         Account account = accountService.getAccountByFeedId(id)
-                .orElseGet(() -> accountService.save(new Account(String.valueOf(responseUserName.get("username")), profileInfo.get("profilePicUrl").toString(), profileInfo.get("biography").toString(), Long.parseLong(profileInfo.get("following").toString()), Long.parseLong(profileInfo.get("follower").toString()), id, "", Boolean.FALSE)));
+                .orElseGet(() -> accountService.save(new Account(String.valueOf(
+                        responseUserName.get("username")),
+                        profileInfo.get("profilePicUrl").toString(),
+                        profileInfo.get("biography").toString(),
+                        Long.parseLong(profileInfo.get("following").toString()),
+                        Long.parseLong(profileInfo.get("follower").toString()),
+                        id,
+                        savedProfileImgPath,
+                        Boolean.FALSE)));
+
 
         return new UserDTO(id, responseByAccToken, account);
     }

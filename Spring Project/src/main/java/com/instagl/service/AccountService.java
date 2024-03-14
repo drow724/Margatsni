@@ -1,23 +1,18 @@
 package com.instagl.service;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.instagl.dto.ContentDTO;
-import com.instagl.entity.Content;
-import com.instagl.entity.Image;
-import com.instagl.entity.Location;
-import com.instagl.repository.LocationRepository;
-import com.instagl.util.RestTemplateUtil;
 import com.instagl.util.TypeUtil;
 import com.microsoft.playwright.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import com.instagl.entity.Account;
@@ -26,10 +21,11 @@ import com.instagl.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
 
+import static com.instagl.constant.AccountConstant.FILE_DIR_PATH;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {
-
 	private final AccountRepository accountRepository;
 
 	@Value("${instagram.craw.profile}")
@@ -100,4 +96,23 @@ public class AccountService {
 
 		return resultData;
     }
+
+	public String saveProfileImageFile(String profileImageUrl, String fileName) {
+		try (BufferedInputStream in = new BufferedInputStream(new URL(profileImageUrl).openStream());
+			 FileOutputStream fileOutputStream = new FileOutputStream(FILE_DIR_PATH + fileName)) {
+
+			byte dataBuffer[] = new byte[1024];
+			int bytesRead;
+			while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+				fileOutputStream.write(dataBuffer, 0, bytesRead);
+			}
+
+			in.close();
+			fileOutputStream.close();
+
+			return FILE_DIR_PATH + fileName;
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

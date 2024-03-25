@@ -45,7 +45,7 @@ public class ShareController {
 
 		Account account = accountService.changeUpdateState(userDTO.getFeedId());
 
-		executor.execute(() -> shareService.updateFeed(account));
+		executor.execute(() -> shareService.updateFeed(account, userDTO.getAccessToken()));
 
 		return new UserDTO(account.getFeedId(), userDTO.getAccessToken(), account);
 	}

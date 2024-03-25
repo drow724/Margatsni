@@ -1,9 +1,6 @@
 package com.instagl.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -117,7 +114,9 @@ public class ShareService {
 			return content;
 		}, executor)).toList();
 
-		List<Content> contents = dataList.stream().map(output -> output.join()).filter(output -> output != null).collect(Collectors.toList());
+		List<Content> contents = dataList.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList());
+
+		contentServie.saveAll(contents);
 
 		List<CompletableFuture<ContentDTO>> contentDTOs = contents.stream().map(content -> CompletableFuture.supplyAsync(() -> {
 			Map<String, Object> response =
@@ -133,7 +132,7 @@ public class ShareService {
 			Map<String, Object> children = (Map<String, Object>) response.get("children");
 			List<Map<String, Object>> map = (List<Map<String, Object>>) children.get("data");
 
-			List<String> ids = map.stream().map(d -> String.valueOf(d.get("id"))).collect(Collectors.toList());
+			List<String> ids = map.stream().map(d -> String.valueOf(d.get("id"))).toList();
 
 			List<CompletableFuture<Image>> imageFuture = ids.stream().map(id -> CompletableFuture.supplyAsync(() -> {
 				Map<String, Object> child = restTemplate.exchange(mediaUrl.replaceAll("\\{id\\}", id) + accessToken, HttpMethod.GET, RestTemplateUtil.DEFAULT_HTTP_ENTITY, TypeUtil.MAP)
@@ -142,14 +141,17 @@ public class ShareService {
 			}, executor)).toList();
 
 			List<Image> images = imageFuture.stream().map(CompletableFuture::join).collect(Collectors.toList());
+
+			imageService.saveAll(images);
 			return new ContentDTO(content, images);
 		}, executor)).toList();
 
-		return contentDTOs.stream().map(CompletableFuture::join).collect(Collectors.toList());
+        return contentDTOs.stream().map(CompletableFuture::join).collect(Collectors.toList());
 	}
 
-	public void updateFeed(Account account) {
+	public void updateFeed(Account account, String accessToken) {
 		account.changeUpdating();
 		accountService.save(account);
+		getLocationInfo(accessToken);
 	}
 }

@@ -23,6 +23,10 @@ public class ContentServie {
 		return contentRepository.save(content);
 	}
 
+	public List<Content> saveAll(List<Content> contents) {
+		return contentRepository.saveAll(contents);
+	}
+
 	public List<Content> findByAccountId(Account account) {
 		return contentRepository.findByAccount(account);
 	}

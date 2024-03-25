@@ -72,7 +72,7 @@ public class AccountService {
 			page.navigate(userCrawProfileUrl.replaceAll("\\{nickname\\}", nickName.toString()));
 
 			Response postResponse = page
-					.waitForResponse(response -> response.url().contains(nickName.toString()), () -> {});
+					.waitForResponse(response -> response.url().contains("https://www.instagram.com/api/v1/users/web_profile_info"), () -> {});
 
 			Map<String, Object> post = mapper.readValue(postResponse.text(), TypeUtil.JSON_MAP);
 

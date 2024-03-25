@@ -17,11 +17,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.instagl.constant.AccountConstant.FILE_DIR_PATH;
 
 @RestController
 @RequestMapping("/login/")
@@ -29,6 +26,9 @@ import static com.instagl.constant.AccountConstant.FILE_DIR_PATH;
 public class LoginController {
     @Value("${instagram.me.profile}")
     private String userProfileUrl;
+
+    @Value("${file.route}")
+    private String fileRoute;
 
     private final AccountService accountService;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -71,7 +71,7 @@ public class LoginController {
         // 프로필 정보 크롤링
         Map<String, Object> profileInfo = accountService.getProfileInfo(responseUserName.get("username"));
         // 로컬 프로필 저장경로
-        String savedProfileImgPath = FILE_DIR_PATH + CommonUtil.getTodayInSeconds() + "_" + id + ".jpg";
+        String savedProfileImgPath = fileRoute + CommonUtil.getTodayInSeconds() + "_" + id + ".jpg";
 
         // 유저 고유ID Name 프로필이미지 Response -> account Table
         Account account = accountService.getAccountByFeedId(id)

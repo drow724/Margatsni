@@ -142,7 +142,6 @@ public class ShareService {
 
 			List<Image> images = imageFuture.stream().map(CompletableFuture::join).collect(Collectors.toList());
 
-			imageService.saveAll(images);
 			return new ContentDTO(content, images);
 		}, executor)).toList();
 

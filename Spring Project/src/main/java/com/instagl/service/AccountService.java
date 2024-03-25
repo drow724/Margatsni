@@ -45,7 +45,7 @@ public class AccountService {
 	public Account save(Account account) {
 		// 프로필 이미지 저장(기본 프로필일 경우에도 저장)
 		this.saveProfileImageFile(account.getProfilePicUrl(), account.getProfileImgPath());
-
+		account.setProfilePicUrl(account.getProfileImgPath());
 		return accountRepository.save(account);
 	}
 
